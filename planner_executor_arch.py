@@ -1,9 +1,25 @@
-from model import LLM
+from model import llm_basic, llm_advanced
+from tavily import TavilyClient
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+
+def web_search(query: str) -> str:
+    """Perform a web search for the given query."""
+    response = client.search(
+        query=query,
+        search_depth="advanced",
+        max_results=2
+        )
+    return response
 
 def planner_fn(state):
     question = state["question"]
 
-    plan = llm(f"""
+    plan = llm_basic.invoke(f"""
     Break this question into sub-questions for deep research:
     {question}
     """)
@@ -22,7 +38,7 @@ def search_fn(state):
 def analyze_fn(state):
     docs = state["documents"]
 
-    insights = llm(f"""
+    insights = llm_advanced.invoke(f"""
     Extract key insights and compare sources:
     {docs}
     """)
@@ -32,7 +48,7 @@ def analyze_fn(state):
 def synthesize_fn(state):
     insights = state["insights"]
 
-    answer = llm(f"""
+    answer = llm_basic.invoke(f"""
     Write a structured, well-reasoned answer:
     {insights}
     """)
