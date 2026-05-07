@@ -5,7 +5,7 @@ from graph import build_agent
 
 genome = init_genome()
 
-#genome["tools"] = ["web_search", "summarize"]
+genome["tools"] = ["web_search", "summarize"]
 
 agent = build_agent(genome)
 
