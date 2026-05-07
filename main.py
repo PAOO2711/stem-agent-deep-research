@@ -14,7 +14,7 @@ def main():
         agent = build_agent(genome)
 
         # Get the agent's answer
-        answer = agent.invoke({"question": question})
+        answer = agent.invoke({"question": question, "tools": genome["tools"]})
 
         score, feedback = evaluate(question, answer)
 

@@ -1,7 +1,21 @@
 from langgraph.graph import StateGraph, START, END
+from typing import TypedDict, List, Optional
+from direct_arch import direct_architecture
+from planner_executor_arch import planner_fn, search_fn, analyze_fn, synthesize_fn
+from reflection import reflect_fn
+
+class AgentState(TypedDict, total=False):
+    question: str
+    tools: List[str]
+    plan: Optional[str]
+    documents: Optional[List[str]]
+    insights: Optional[str]
+    answer: Optional[str]
+
 
 def build_agent(genome):
-    graph = StateGraph(dict)
+    graph = StateGraph(AgentState)
+
 
     if genome["architecture"] == "direct":
         graph.add_node("answer", direct_architecture)
@@ -21,9 +35,9 @@ def build_agent(genome):
         graph.add_edge("analyze", "synthesize")
 
         if genome["reflection"]:
-            graph.add_node("feedback", feedback)
-            graph.add_edge("synthesize", "feedback")
-            graph.add_edge("feedback", END)
+            graph.add_node("reflect", reflect_fn)
+            graph.add_edge("synthesize", "reflect")
+            graph.add_edge("reflect", END)
         else:
             graph.add_edge("synthesize", END)
     

@@ -24,4 +24,4 @@ def summarize(text: str) -> str:
 
     summary = llm_advanced.invoke(f"Summarize this text: {text}")
 
-    return summary
+    return summary.content
