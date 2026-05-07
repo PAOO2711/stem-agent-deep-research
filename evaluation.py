@@ -2,10 +2,14 @@ from pydantic import BaseModel, Field
 from model import llm_advanced
 from langchain_core.prompts import ChatPromptTemplate
 
-
-
 class Evaluator(BaseModel):
-    score: int = Field(default=0, description="Score from 0 to 10")
+    #score: int = Field(default=0, description="Score from 0 to 10")
+    correctness: int = Field(default=0, description="Correctness score (0-2)")
+    depth: int = Field(default=0, description="Depth score (0-2)")
+    structure: int = Field(default=0, description="Structure score (0-2)")
+    sources: int = Field(default=0, description="Sources score (0-2)")
+    bonus: int = Field(default=0, description="Bonus points (0-2)")
+    penalties: int = Field(default=0, description="Total penalties deducted")
     feedback: str = Field(default="", description="Feedback for improvement")
 
 def evaluate(question: str, answer: str) -> (float, str):
@@ -49,8 +53,7 @@ def evaluate(question: str, answer: str) -> (float, str):
             - anticipates counterarguments
             - demonstrates expert-level synthesis
 
-        Final score = correctness + depth + structure + sources + bonus - penalties
-        Clamp between 0 and 10.
+        
 
         Be strict. Most answers should score between 3 and 7.
         Scores above 8 are rare and only for near-perfect answers.
@@ -62,8 +65,10 @@ def evaluate(question: str, answer: str) -> (float, str):
         - depth
         - structure
         - sources
+        - penalties
+        - bonus
 
-        Also give a detailed feedback on how to improve the answer based on the evaluation criteria.
+        Also give a detailed feedback showing the evaluation phase and how to improve the answer based on the evaluation criteria.
 
         Question: {question}
         Answer: {answer}
@@ -75,4 +80,12 @@ def evaluate(question: str, answer: str) -> (float, str):
         strict=True,
     ).invoke(prompt.format_messages())
 
-    return evaluation.score, evaluation.feedback
+    total_score = evaluation.correctness + evaluation.depth + evaluation.structure + evaluation.sources + evaluation.bonus - evaluation.penalties
+    total_score = max(0, min(10, total_score))  # Clamp between 0 and 10
+
+    return total_score, evaluation.feedback
+
+
+""" Final score = correctness + depth + structure + sources + bonus - penalties
+        Do NOT adjust the final score subjectively.
+        Clamp between 0 and 10. """
