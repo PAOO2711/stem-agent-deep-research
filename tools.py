@@ -10,13 +10,35 @@ tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 @tool
 def web_search(query: str) -> str:
     """Perform a web search for the given query."""
-    
+
     response = tavily_client.search(
         query=query,
         search_depth="advanced",
+        max_results=5,
     )
-    
-    return response
+
+    results = response.get("results", [])
+    if not results:
+        return "No se encontraron resultados para esta busqueda."
+
+    snippets = []
+    references = []
+
+    for i, item in enumerate(results, start=1):
+        title = item.get("title", "Sin titulo")
+        url = item.get("url", "")
+        content = (item.get("content", "") or "").strip().replace("\n", " ")
+
+        snippets.append(f"[{i}] {title}: {content}")
+        if url:
+            references.append(f"[{i}] {url}")
+
+    return (
+        "Resultados de busqueda:\n"
+        + "\n".join(snippets)
+        + "\n\nReferencias:\n"
+        + "\n".join(references)
+    )
 
 @tool
 def summarize(text: str) -> str:

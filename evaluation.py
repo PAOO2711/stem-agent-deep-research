@@ -5,7 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 
 class Evaluator(BaseModel):
-    score: int = Field(default=0, description="Score from 0 to 10"),
+    score: int = Field(default=0, description="Score from 0 to 10")
     feedback: str = Field(default="", description="Feedback for improvement")
 
 def evaluate(question: str, answer: str) -> (float, str):
@@ -30,6 +30,6 @@ def evaluate(question: str, answer: str) -> (float, str):
     evaluation = llm_basic.with_structured_output(
         Evaluator,
         strict=True,
-    ).invoke(prompt)
+    ).invoke(prompt.format_messages())
 
     return evaluation.score, evaluation.feedback

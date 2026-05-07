@@ -9,8 +9,11 @@ genome["tools"] = ["web_search", "summarize"]
 
 agent = build_agent(genome)
 
-answer = agent.invoke({"question": question, "tools": genome["tools"]})
+question = "What are transformers in machine learning?"
 
-score, feedback = evaluate("What are transformers in machine learning?", answer)
+result = agent.invoke({"question": question, "tools": genome["tools"]})
+answer = result["answer"]
+
+score, feedback = evaluate(question, answer)
 
 print(f"Score: {score}\nFeedback: {feedback}\nResponse: {answer}")

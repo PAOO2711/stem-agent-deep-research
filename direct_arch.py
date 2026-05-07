@@ -6,4 +6,4 @@ def direct_architecture(state) -> str:
 
     answer = invoke_text(llm, f"Answer this question directly: {state['question']}")
 
-    return answer
+    return {"answer": answer}

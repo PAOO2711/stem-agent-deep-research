@@ -22,9 +22,14 @@ def create_llm(llm, tool_names):
 
 
 def invoke_text(llm, prompt: str) -> str:
-    if hasattr(llm, "steps"):
+    # Agents created with create_agent expect a dict state with messages.
+    try:
         result = llm.invoke({"messages": [HumanMessage(content=prompt)]})
-        return result["messages"][-1].content
+        if isinstance(result, dict) and "messages" in result:
+            return result["messages"][-1].content
+    except Exception:
+        pass
 
+    # Plain chat models accept string/message input and return AIMessage.
     response = llm.invoke(prompt)
     return response.content
