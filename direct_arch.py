@@ -7,7 +7,7 @@ def direct_architecture(state) -> str:
     improved_text = ""
 
     if "web_search" in state["tools"]:
-        improved_text = "If you use web_search results, include a final section called References with the exact source URLs you used."
+        improved_text = "If you use web_search results, include a final section called Sources with the exact source URLs you used."
 
     answer = invoke_text(
         llm,

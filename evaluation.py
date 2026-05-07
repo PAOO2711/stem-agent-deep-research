@@ -34,6 +34,11 @@ def evaluate(question: str, answer: str) -> (float, str):
             0: no sources cited
             1: sources cited but low quality or generic
             2: high-quality sources (papers, docs, reputable articles) properly cited
+        - Penalties. Deduct points if:
+            - no citations when required (-2)
+            - each hallucinated claim: (-1)
+            - severe hallucination: (-2)
+            - shallow reasoning (-1 to -2)
         
         BONUS (0–2 points):
         - 0: basic answer, no synthesis
@@ -43,11 +48,6 @@ def evaluate(question: str, answer: str) -> (float, str):
             - includes nuanced reasoning
             - anticipates counterarguments
             - demonstrates expert-level synthesis
-
-        Penalties. Deduct points if:
-        - no citations when required (-2)
-        - hallucinated facts (-2)
-        - shallow reasoning (-1 to -2)
 
         Final score = correctness + depth + structure + sources + bonus - penalties
         Clamp between 0 and 10.
