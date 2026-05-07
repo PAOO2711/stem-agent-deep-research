@@ -34,6 +34,22 @@ def invoke_text(llm, prompt: str) -> str:
             messages = result["messages"]
             answer = messages[-1].content
 
+            # Print tool calls and tool results for debugging/visibility
+            for msg in messages:
+                # model decided to call a tool
+                if getattr(msg, "tool_calls", None):
+                    try:
+                        print("Herramienta solicitada:", msg.tool_calls)
+                    except Exception:
+                        print("Herramienta solicitada (no serializable)")
+
+                # tool executed and returned a ToolMessage
+                """ if type(msg).__name__ == "ToolMessage":
+                    name = getattr(msg, "name", None)
+                    content = str(getattr(msg, "content", ""))
+                    print(f"Herramienta ejecutada: {name}")
+                    print("Salida (primeros 300 chars):", content[:300]) """
+
             references = []
             for message in messages:
                 if type(message).__name__ == "ToolMessage":

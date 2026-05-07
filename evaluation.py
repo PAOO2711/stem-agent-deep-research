@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from model import llm_basic
+from model import llm_advanced
 from langchain_core.prompts import ChatPromptTemplate
 
 
@@ -19,13 +19,41 @@ def evaluate(question: str, answer: str) -> (float, str):
         
         How to evaluate:
         - Correctness: Is the answer factually accurate and does it address the question directly? (0-2 points)
+            0: incorrect or irrelevant answer
+            1: partially correct but incomplete
+            2: fully correct and directly answers question
         - Depth: Does the answer provide in-depth insights and analysis? (0-2 points)
+            0: superficial or single sentence
+            1: some explanation but shallow
+            2: deep reasoning, multiple aspects covered
         - Structure: Is the answer well-organized and easy to follow? (0-2 points)
-        - References: Are credible sources properly cited and used to support the claims? (0-2 points)
+            0: disorganized or hard to follow
+            1: somewhat structured 
+            2: clear sections, logical flow 
+        - Sources: Are credible sources properly cited and used to support the claims? (0-2 points)
+            0: no sources cited
+            1: sources cited but low quality or generic
+            2: high-quality sources (papers, docs, reputable articles) properly cited
+        
+        BONUS (0–2 points):
+        - 0: basic answer, no synthesis
+        - 1: strong reasoning or good synthesis of ideas
+        - 2: publication-level answer:
+            - integrates multiple perspectives
+            - includes nuanced reasoning
+            - anticipates counterarguments
+            - demonstrates expert-level synthesis
 
-        In each category, a 0 indicates a poor performance, while a 2 indicates an excellent performance with no failures.
+        Penalties. Deduct points if:
+        - no citations when required (-2)
+        - hallucinated facts (-2)
+        - shallow reasoning (-1 to -2)
 
-        Total score should be between 0 and 10.
+        Final score = correctness + depth + structure + sources + bonus - penalties
+        Clamp between 0 and 10.
+
+        Be strict. Most answers should score between 3 and 7.
+        Scores above 8 are rare and only for near-perfect answers.
 
         """),
         ("user", f"""
@@ -33,7 +61,7 @@ def evaluate(question: str, answer: str) -> (float, str):
         - correctness
         - depth
         - structure
-        - references
+        - sources
 
         Also give a detailed feedback on how to improve the answer based on the evaluation criteria.
 
@@ -42,7 +70,7 @@ def evaluate(question: str, answer: str) -> (float, str):
         """)
     ])
 
-    evaluation = llm_basic.with_structured_output(
+    evaluation = llm_advanced.with_structured_output(
         Evaluator,
         strict=True,
     ).invoke(prompt.format_messages())
