@@ -1,4 +1,4 @@
-from graph import build_agent, Agent
+from graph import build_agent
 from mutation import init_genome, mutate
 from evaluation import evaluate, stop_condition
 
@@ -8,13 +8,17 @@ def main():
 
     # Example question to test the agent
     question = input("Enter a question for deep research: ")
+
+    question += ".Do a deep research and provide a comprehensive answer."
+
+    score = 0
     
     for i in range(5):  
         # Build the agent based on the genome
         agent = build_agent(genome)
 
         # Get the agent's answer
-        answer = agent.invoke({"question": question, "tools": genome["tools"]})
+        answer = agent.invoke({"question": question, "tools": genome.tools})
 
         score, feedback = evaluate(question, answer)
 
@@ -28,3 +32,6 @@ def main():
     
     print(f"Question: {question}")
     print(f"Answer: {answer}")
+
+if __name__ == "__main__":
+    main()
