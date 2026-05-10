@@ -450,7 +450,7 @@ def refinement_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             logger.info(f"Identified {len(gap_queries)} gaps to fill with additional search")
             gap_results = []
             for query in gap_queries:
-                result = web_search(query, max_results=2)
+                result = web_search(query, max_results=1)
                 gap_results.append(result)
             
             # Enhance original answer with gap-filling results
@@ -468,9 +468,16 @@ def refinement_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             
             refined_answer = llm_advanced.invoke(enhancement_prompt).content
             
-            logger.info("Refinement complete: Answer enhanced with additional research")
+            # Append sources from gap_results to the refined answer
+            gap_sources = extract_sources(gap_results)
+            if gap_sources:
+                refined_answer_with_sources = f"{refined_answer}\n\nAdditional Sources:\n{chr(10).join(gap_sources)}"
+            else:
+                refined_answer_with_sources = refined_answer
             
-            return {"refined_answer": refined_answer}
+            logger.info("Refinement complete: Answer enhanced with additional research and sources")
+            
+            return {"refined_answer": refined_answer_with_sources}
         else:
             logger.info("No significant gaps identified in answer")
             return {"refined_answer": answer}
