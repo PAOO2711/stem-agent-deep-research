@@ -2,6 +2,13 @@ from graph import build_agent
 from mutation import init_genome, mutate
 from evaluation import evaluate, stop_condition
 
+
+def extract_final_answer(result):
+    """Extract the final answer text from graph output state."""
+    if isinstance(result, dict):
+        return result.get("refined_answer") or result.get("answer") or ""
+    return str(result)
+
 def main():
     # Initialize the agent's genome
     genome = init_genome()
@@ -17,8 +24,9 @@ def main():
         # Build the agent based on the genome
         agent = build_agent(genome)
 
-        # Get the agent's answer
-        answer = agent.invoke({"question": question, "tools": genome.tools})
+        # Graph returns full state; extract only the final answer text
+        result = agent.invoke({"question": question, "tools": genome.tools})
+        answer = extract_final_answer(result)
 
         score, feedback = evaluate(question, answer)
 
@@ -26,6 +34,7 @@ def main():
             break
     
         # Update genome based on feedback
+        print("---------MUTATING GENOME BASED ON FEEDBACK---------")
         new_genome = mutate(genome, feedback)
         genome = new_genome
     
