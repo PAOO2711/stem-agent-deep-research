@@ -85,7 +85,6 @@ def evaluate(question: str, answer: str) -> (float, str):
 
     return total_score, evaluation.feedback
 
-
-""" Final score = correctness + depth + structure + sources + bonus - penalties
-        Do NOT adjust the final score subjectively.
-        Clamp between 0 and 10. """
+def stop_condition(score: int) -> bool:
+    """Determine if the score is good enough to stop further iterations."""
+    return score > 8  # Threshold for stopping

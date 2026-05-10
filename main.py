@@ -1,6 +1,6 @@
 from graph import build_agent, Agent
 from mutation import init_genome, mutate
-from evaluation import evaluate
+from evaluation import evaluate, stop_condition
 
 def main():
     # Initialize the agent's genome
