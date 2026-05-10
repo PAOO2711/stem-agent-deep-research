@@ -33,12 +33,12 @@ class Genome(BaseModel):
 
 def init_genome():
     """Initialize a default genome configuration."""
-    return {
-        "architecture": "direct",
-        "tools": [],
-        "reflection": False,
-        "refinement": False,
-    }
+    return Genome(
+        architecture="direct",
+        tools=[],
+        reflection=False,
+        refinement=False,
+    )
 
 def mutate(genome, feedback):
     """
