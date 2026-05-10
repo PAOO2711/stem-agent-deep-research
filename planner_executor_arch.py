@@ -73,7 +73,7 @@ class PlanModel(BaseModel):
     sub_questions: List[str] = Field(..., description="List of specific research queries (4-6 items)")
 
 
-def web_search(query: str, max_results: int = 3) -> Dict[str, Any]:
+def web_search(query: str, max_results: int = 2) -> Dict[str, Any]:
     """
     Perform a web search for the given query using Tavily API.
     
@@ -262,8 +262,8 @@ def search_fn(state: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         for i, query in enumerate(sub_questions, 1):
-            logger.info(f"Searching [{i}/{len(sub_questions)}]: {query[:80]}...")
-            result = web_search(query, max_results=3)
+            #logger.info(f"Searching [{i}/{len(sub_questions)}]: {query[:80]}...")
+            result = web_search(query, max_results=2)
             search_results.append(result)
         
         logger.info(f"Search phase complete: {len(search_results)} results collected")

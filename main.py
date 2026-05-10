@@ -19,6 +19,10 @@ def main():
     question += ".Do a deep research and provide a comprehensive answer."
 
     score = 0
+
+    best_score = 0
+    best_answer = ""
+    best_genome = genome
     
     for i in range(5):  
         # Build the agent based on the genome
@@ -30,17 +34,27 @@ def main():
 
         score, feedback = evaluate(question, answer)
 
-        if stop_condition(score):
+        # Keep track of the best answer and genome configuration
+        if score > best_score:
+            best_score = score
+            best_answer = answer
+            best_genome = genome
+        
+
+        if stop_condition(best_score):
             break
     
         # Update genome based on feedback
-        print("---------MUTATING GENOME BASED ON FEEDBACK---------")
-        new_genome = mutate(genome, feedback)
+        print("---------MUTATING GENOME BASED ON FEEDBACK---------\n")
+        print(f"Score: {score}\n")
+        new_genome = mutate(best_genome, feedback)
+        print(f"New Genome Configuration:\n{new_genome}\n")
+        print("--------------------------------------------------\n")
         genome = new_genome
     
     
     print(f"Question: {question}")
-    print(f"Answer: {answer}")
+    print(f"Answer: {best_answer}")
 
 if __name__ == "__main__":
     main()
