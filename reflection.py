@@ -25,7 +25,7 @@ def reflect_fn(state: Dict[str, Any]) -> Dict[str, Any]:
     raw model content if structured output fails.
     """
 
-    logger.info("Starting reflection phase to review and improve the answer")
+    #logger.info("Starting reflection phase to review and improve the answer")
     answer = state.get("refined_answer") or state.get("answer")
     if not answer:
         logger.warning("reflect_fn called without 'answer' in state")
@@ -64,7 +64,7 @@ def reflect_fn(state: Dict[str, Any]) -> Dict[str, Any]:
         if sources_section:
             revised_answer = revised_answer + sources_section
 
-        logger.info("Reflection complete: Answer improved with structured feedback")
+        #logger.info("Reflection complete: Answer improved with structured feedback")
 
         return {"answer": revised_answer, "reflection": structured.dict()}
     except Exception as e:

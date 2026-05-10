@@ -39,14 +39,23 @@ def main():
             best_score = score
             best_answer = answer
             best_genome = genome
+        else:
+            print("-------ROLLBACK TO BEST GENOME-------\n")
         
+        if hasattr(feedback, "model_dump"):
+            feedback_display = feedback.model_dump()
+        elif isinstance(feedback, dict):
+            feedback_display = feedback
+        else:
+            feedback_display = str(feedback)
+
+        print(f"Score: {score}\nFeedback: {feedback_display}\n")
 
         if stop_condition(best_score):
             break
     
         # Update genome based on feedback
         print("---------MUTATING GENOME BASED ON FEEDBACK---------\n")
-        print(f"Score: {score}\n")
         new_genome = mutate(best_genome, feedback)
         print(f"New Genome Configuration:\n{new_genome}\n")
         print("--------------------------------------------------\n")

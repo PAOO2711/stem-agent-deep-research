@@ -61,7 +61,7 @@ def extract_queries(plan: str, max_queries: int = 5) -> List[str]:
         # Limit to max_queries
         queries = queries[:max_queries]
         
-        logger.info(f"Extracted {len(queries)} queries from plan")
+        #logger.info(f"Extracted {len(queries)} queries from plan")
         return queries
     except Exception as e:
         logger.error(f"Error extracting queries: {e}")
@@ -96,7 +96,7 @@ def web_search(query: str, max_results: int = 2) -> Dict[str, Any]:
             #topic="news"  # Focus on current information
         )
         
-        logger.info(f"Search completed for '{query}': {len(response.get('results', []))} results")
+        #logger.info(f"Search completed for '{query}': {len(response.get('results', []))} results")
         return {
             "query": query,
             "results": response.get("results", []),
@@ -182,7 +182,7 @@ def planner_fn(state: Dict[str, Any]) -> Dict[str, Any]:
         return {"plan": "", "sub_questions": []}
     
     question = state["question"].strip()
-    logger.info(f"Planning research for question: {question[:100]}...")
+    #logger.info(f"Planning research for question: {question[:100]}...")
     
     try:
         # Use structured output to get both the plan text and the sub-questions
@@ -203,7 +203,7 @@ def planner_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             plan_text = structured.plan_text
             sub_questions = structured.sub_questions
 
-            logger.info(f"Planning complete: {len(sub_questions)} sub-questions identified (structured)")
+            #logger.info(f"Planning complete: {len(sub_questions)} sub-questions identified (structured)")
             return {"plan": plan_text, "sub_questions": sub_questions}
         except Exception as se:
             # Fallback: two-step approach (previous behavior)
@@ -227,7 +227,7 @@ def planner_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             plan = llm_basic.invoke(planning_prompt).content
             sub_questions = extract_queries(plan, max_queries=6)
 
-            logger.info(f"Planning complete: {len(sub_questions)} sub-questions identified (fallback)")
+            #logger.info(f"Planning complete: {len(sub_questions)} sub-questions identified (fallback)")
             return {"plan": plan, "sub_questions": sub_questions}
     except Exception as e:
         logger.error(f"Error in planning phase: {e}")
@@ -256,7 +256,7 @@ def search_fn(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.warning("No sub-questions provided for search phase")
         return {"search_results": []}
     
-    logger.info(f"Starting search phase: {len(sub_questions)} queries to execute")
+    #logger.info(f"Starting search phase: {len(sub_questions)} queries to execute")
     
     search_results = []
     
@@ -266,7 +266,7 @@ def search_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             result = web_search(query, max_results=2)
             search_results.append(result)
         
-        logger.info(f"Search phase complete: {len(search_results)} results collected")
+        #logger.info(f"Search phase complete: {len(search_results)} results collected")
         
         return {"search_results": search_results}
     except Exception as e:
@@ -296,7 +296,7 @@ def analyze_fn(state: Dict[str, Any]) -> Dict[str, Any]:
     search_results = state.get("search_results", [])
     question = state.get("question", "")
     
-    logger.info(f"Analyzing {len(search_results)} search results...")
+    #logger.info(f"Analyzing {len(search_results)} search results...")
     
     try:
         # Format search results for analysis
@@ -328,7 +328,7 @@ def analyze_fn(state: Dict[str, Any]) -> Dict[str, Any]:
         
         insights = llm_advanced.invoke(analysis_prompt).content
         
-        logger.info("Analysis complete: Insights extracted")
+        #logger.info("Analysis complete: Insights extracted")
         
         return {"insights": insights}
     except Exception as e:
@@ -359,7 +359,7 @@ def synthesize_fn(state: Dict[str, Any]) -> Dict[str, Any]:
     question = state.get("question", "")
     sub_questions = state.get("sub_questions", [])
     
-    logger.info("Starting synthesis phase...")
+    #logger.info("Starting synthesis phase...")
     
     try:
         synthesis_prompt = f"""
@@ -392,7 +392,7 @@ def synthesize_fn(state: Dict[str, Any]) -> Dict[str, Any]:
         else:
             answer_with_sources = answer
 
-        logger.info("Synthesis complete: Final answer generated (with sources appended)")
+        #logger.info("Synthesis complete: Final answer generated (with sources appended)")
 
         return {"answer": answer_with_sources}
     except Exception as e:
@@ -426,7 +426,7 @@ def refinement_fn(state: Dict[str, Any]) -> Dict[str, Any]:
     answer = state.get("answer", "")
     question = state.get("question", "")
     
-    logger.info("Starting refinement phase...")
+    #logger.info("Starting refinement phase...")
     
     try:
         refinement_prompt = f"""
@@ -447,7 +447,7 @@ def refinement_fn(state: Dict[str, Any]) -> Dict[str, Any]:
         gap_queries = extract_queries(gaps, max_queries=3)
         
         if gap_queries:
-            logger.info(f"Identified {len(gap_queries)} gaps to fill with additional search")
+            #logger.info(f"Identified {len(gap_queries)} gaps to fill with additional search")
             gap_results = []
             for query in gap_queries:
                 result = web_search(query, max_results=1)
@@ -471,15 +471,15 @@ def refinement_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             # Append sources from gap_results to the refined answer
             gap_sources = extract_sources(gap_results)
             if gap_sources:
-                refined_answer_with_sources = f"{refined_answer}\n\nAdditional Sources:\n{chr(10).join(gap_sources)}"
+                refined_answer_with_sources = f"{refined_answer}\n\nSources:\n{chr(10).join(gap_sources)}"
             else:
                 refined_answer_with_sources = refined_answer
             
-            logger.info("Refinement complete: Answer enhanced with additional research and sources")
+            #logger.info("Refinement complete: Answer enhanced with additional research and sources")
             
             return {"refined_answer": refined_answer_with_sources}
         else:
-            logger.info("No significant gaps identified in answer")
+            #logger.info("No significant gaps identified in answer")
             return {"refined_answer": answer}
     except Exception as e:
         logger.error(f"Error in refinement phase: {e}")

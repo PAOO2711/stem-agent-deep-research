@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from model import llm_advanced
 from langchain_core.prompts import ChatPromptTemplate
+from typing import Literal
 
 class Evaluator(BaseModel):
     #score: int = Field(default=0, description="Score from 0 to 10")
@@ -12,7 +13,18 @@ class Evaluator(BaseModel):
     penalties: int = Field(default=0, description="Total penalties deducted")
     feedback: str = Field(default="", description="Feedback for improvement")
 
-def evaluate(question: str, answer: str) -> (float, str):
+
+class FeedbackSignals(BaseModel):
+    missing_information: bool = Field(default=False, description="Answer is missing important information")
+    needs_multi_step_reasoning: bool = Field(default=False, description="Question needs a multi-step reasoning approach")
+    poor_structure: bool = Field(default=False, description="Answer structure is weak or hard to follow")
+    research_gaps: bool = Field(default=False, description="There are gaps in research coverage or sources")
+    weak_sources: bool = Field(default=False, description="Sources are missing, weak, or not credible enough")
+    hallucinations: bool = Field(default=False, description="Answer contains hallucinated or unsupported claims")
+    severity: Literal["low", "medium", "high"] = Field(default="low", description="Overall severity of the issues")
+    feedback_text: str = Field(default="", description="Short human-readable summary of the issues")
+
+def evaluate(question: str, answer: str) -> (float, FeedbackSignals):
     """Evaluate the agent's answer and return a score and feedback."""
     
     system_message = """You are an expert evaluator for deep research questions.
@@ -63,7 +75,7 @@ def evaluate(question: str, answer: str) -> (float, str):
     - penalties
     - bonus
 
-    Also give a detailed feedback showing the evaluation phase and how to improve the answer based on the evaluation criteria.
+    Also return structured feedback signals that can be used by the mutation step.
 
     Question: {question}
     Answer: {answer}"""
@@ -78,10 +90,33 @@ def evaluate(question: str, answer: str) -> (float, str):
         strict=True,
     ).invoke(prompt.format_messages(question=question, answer=answer))
 
+    feedback_prompt = ChatPromptTemplate.from_messages([
+        ("system", """You are a strict classifier that converts an evaluation into structured feedback signals.
+Return only the schema fields and no extra text."""),
+        ("user", f"""Question: {question}
+Answer: {answer}
+
+Evaluation scores:
+correctness={evaluation.correctness}
+depth={evaluation.depth}
+structure={evaluation.structure}
+sources={evaluation.sources}
+bonus={evaluation.bonus}
+penalties={evaluation.penalties}
+feedback={evaluation.feedback}
+
+Classify the answer into structured signals with severity.""")
+    ])
+
+    feedback = llm_advanced.with_structured_output(
+        FeedbackSignals,
+        strict=True,
+    ).invoke(feedback_prompt.format_messages())
+
     total_score = evaluation.correctness + evaluation.depth + evaluation.structure + evaluation.sources + evaluation.bonus - abs(evaluation.penalties)
     total_score = max(0, min(10, total_score))  # Clamp between 0 and 10
 
-    return total_score, evaluation.feedback
+    return total_score, feedback
 
 def stop_condition(score: int) -> bool:
     """Determine if the score is good enough to stop further iterations."""
