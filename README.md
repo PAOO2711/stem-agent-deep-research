@@ -1,4 +1,4 @@
-# JetBrains-Task-1
+# Stem agent for deep research
 
 ## Setup instructions
 

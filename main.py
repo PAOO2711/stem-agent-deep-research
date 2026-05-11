@@ -10,6 +10,11 @@ def extract_final_answer(result):
     return str(result)
 
 def main():
+    """
+    Runs up to 5 iterations: builds the agent according to the genome,
+    invokes the graph (StateGraph), evaluates the response and mutates the
+    genome based on feedback. Prints the best answer found.
+    """
     # Initialize the agent's genome
     genome = init_genome()
 
@@ -34,8 +39,6 @@ def main():
 
         score, evaluation_score, feedback = evaluate(question, answer)
 
-        
-        
         if hasattr(feedback, "model_dump"):
             feedback_display = feedback.model_dump()
         elif isinstance(feedback, dict):

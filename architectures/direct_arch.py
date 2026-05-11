@@ -2,6 +2,14 @@ from models.agent_factory import create_llm, invoke_text
 from models.model import llm_advanced, llm_basic
 
 def direct_architecture(state) -> str:
+    """Direct architecture: answer the question in a single pass.
+
+    Args:
+        state: Dictionary containing at least 'question' and 'tools'.
+
+    Returns:
+        A dict with the key 'answer' containing the generated text.
+    """
     llm = create_llm(llm_basic, state["tools"])
 
     improved_text = ""
