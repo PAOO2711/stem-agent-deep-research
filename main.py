@@ -1,6 +1,6 @@
-from graph import build_agent
-from mutation import init_genome, mutate
-from evaluation import evaluate, stop_condition
+from functionality.graph import build_agent
+from functionality.mutation import init_genome, mutate
+from functionality.evaluation import evaluate, stop_condition
 
 
 def extract_final_answer(result):

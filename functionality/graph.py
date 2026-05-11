@@ -1,10 +1,10 @@
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, List, Optional, Dict, Any
-from direct_arch import direct_architecture
-from planner_executor_arch import (
+from architectures.direct_arch import direct_architecture
+from architectures.planner_executor_arch import (
     planner_fn, search_fn, analyze_fn, synthesize_fn, refinement_fn
 )
-from reflection import reflect_fn
+from functionality.reflection import reflect_fn
 
 class AgentState(TypedDict, total=False):
     """

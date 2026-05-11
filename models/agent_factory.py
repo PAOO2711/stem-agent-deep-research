@@ -2,8 +2,8 @@ from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 import re
 
-from model import llm_basic, llm_advanced
-from tools import web_search, summarize
+from models.model import llm_basic, llm_advanced
+from functionality.tools import web_search, summarize
 
 TOOL_REGISTRY = {
     "web_search": web_search,

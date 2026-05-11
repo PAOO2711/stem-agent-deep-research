@@ -6,7 +6,7 @@ that breaks down complex questions into sub-questions, researches them,
 analyzes findings, and synthesizes comprehensive answers.
 """
 
-from model import llm_basic, llm_advanced
+from models.model import llm_basic, llm_advanced
 from tavily import TavilyClient
 import os
 import logging

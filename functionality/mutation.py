@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Literal, List, Any
-from model import llm_advanced
+from models.model import llm_advanced
 
 class Genome(BaseModel):
     """

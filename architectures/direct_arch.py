@@ -1,5 +1,5 @@
-from agent_factory import create_llm, invoke_text
-from model import llm_advanced, llm_basic
+from models.agent_factory import create_llm, invoke_text
+from models.model import llm_advanced, llm_basic
 
 def direct_architecture(state) -> str:
     llm = create_llm(llm_basic, state["tools"])

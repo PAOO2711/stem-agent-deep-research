@@ -2,7 +2,7 @@ from langchain.tools import tool
 from tavily import TavilyClient
 from dotenv import load_dotenv
 import os
-from model import llm_basic, llm_advanced
+from models.model import llm_basic, llm_advanced
 
 load_dotenv()
 tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))

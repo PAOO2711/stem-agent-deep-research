@@ -1,4 +1,4 @@
-from model import llm_basic, llm_advanced
+from models.model import llm_basic, llm_advanced
 import logging
 from typing import Dict, Any, List
 from pydantic import BaseModel, Field
