@@ -26,6 +26,19 @@ def _extract_urls(text: str) -> list[str]:
     return re.findall(r"https?://[^\s)\]>,]+", text)
 
 
+def _has_sources_section(text: str) -> bool:
+    return re.search(r"(?im)^\s*(?:#{1,6}\s*)?sources\s*:?\s*$", text) is not None
+
+
+def _strip_trailing_references_section(text: str) -> str:
+    return re.sub(
+        r"\n{2,}(?:#{1,6}\s*)?references\s*:?\s*\n.*\Z",
+        "",
+        text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
+
 def invoke_text(llm, prompt: str) -> str:
     # Agents created with create_agent expect a dict state with messages.
     try:
@@ -39,16 +52,16 @@ def invoke_text(llm, prompt: str) -> str:
                 # model decided to call a tool
                 if getattr(msg, "tool_calls", None):
                     try:
-                        print("Herramienta solicitada:", msg.tool_calls)
+                        print("Tool call:", msg.tool_calls)
                     except Exception:
-                        print("Herramienta solicitada (no serializable)")
+                        print("Tool call: [could not display tool_calls]")
 
                 # tool executed and returned a ToolMessage
                 """ if type(msg).__name__ == "ToolMessage":
                     name = getattr(msg, "name", None)
                     content = str(getattr(msg, "content", ""))
-                    print(f"Herramienta ejecutada: {name}")
-                    print("Salida (primeros 300 chars):", content[:300]) """
+                    print(f"Tool executed: {name}")
+                    print("Output (first 300 chars):", content[:300]) """
 
             references = []
             for message in messages:
@@ -57,8 +70,10 @@ def invoke_text(llm, prompt: str) -> str:
                     references.extend(_extract_urls(content))
 
             unique_references = list(dict.fromkeys(references))
-            if unique_references and "references:" not in answer.lower():
-                answer += "\n\nReferences:\n" + "\n".join(unique_references)
+            answer = _strip_trailing_references_section(answer)
+
+            if unique_references and not _has_sources_section(answer):
+                answer += "\n\nSources:\n" + "\n".join(unique_references)
 
             return answer
     except Exception:

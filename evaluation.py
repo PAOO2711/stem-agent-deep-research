@@ -116,7 +116,7 @@ Classify the answer into structured signals with severity.""")
     total_score = evaluation.correctness + evaluation.depth + evaluation.structure + evaluation.sources + evaluation.bonus - abs(evaluation.penalties)
     total_score = max(0, min(10, total_score))  # Clamp between 0 and 10
 
-    return total_score, feedback
+    return total_score, evaluation, feedback
 
 def stop_condition(score: int) -> bool:
     """Determine if the score is good enough to stop further iterations."""

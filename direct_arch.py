@@ -12,7 +12,7 @@ def direct_architecture(state) -> str:
     answer = invoke_text(
         llm,
         f"""
-        Answer this question directly and vaguely, without a clear structure or sections. Focus on providing a quick answer rather than a detailed explanation.:
+        Answer this question directly:
         {state['question']}
 
         {improved_text}

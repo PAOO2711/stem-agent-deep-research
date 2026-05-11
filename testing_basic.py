@@ -14,6 +14,6 @@ question = "What are transformers in machine learning? Do a deep research and pr
 result = agent.invoke({"question": question, "tools": genome.tools})
 answer = result["answer"]
 
-score, feedback = evaluate(question, answer)
+score, evaluation_score, feedback = evaluate(question, answer)
 
-print(f"Score: {score}\nFeedback: {feedback}\nResponse: {answer}")
+print(f"Score: {score}\nEvaluation: {evaluation_score}\nFeedback: {feedback}\nResponse: {answer}")

@@ -32,15 +32,9 @@ def main():
         result = agent.invoke({"question": question, "tools": genome.tools})
         answer = extract_final_answer(result)
 
-        score, feedback = evaluate(question, answer)
+        score, evaluation_score, feedback = evaluate(question, answer)
 
-        # Keep track of the best answer and genome configuration
-        if score > best_score:
-            best_score = score
-            best_answer = answer
-            best_genome = genome
-        else:
-            print("-------ROLLBACK TO BEST GENOME-------\n")
+        
         
         if hasattr(feedback, "model_dump"):
             feedback_display = feedback.model_dump()
@@ -49,7 +43,15 @@ def main():
         else:
             feedback_display = str(feedback)
 
-        print(f"Score: {score}\nFeedback: {feedback_display}\n")
+        print(f"Score: {score}\nEvaluation: {evaluation_score}\nFeedback: {feedback_display}\n")
+
+        # Keep track of the best answer and genome configuration
+        if score >= best_score:
+            best_score = score
+            best_answer = answer
+            best_genome = genome
+        else:
+            print("-------ROLLBACK TO BEST GENOME-------\n")
 
         if stop_condition(best_score):
             break
