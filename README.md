@@ -54,3 +54,14 @@ feedback_text
 
 The loop stops early when the score is greater than 8.
 
+## Experiments
+
+The repository includes 4 experiments based on open-ended deep research questions.
+
+Each experiment contains the execution output of the evolutionary process, including:
+- agent configurations (genomes),
+- evaluation scores,
+- feedback signals,
+- architecture mutations,
+- and the final evolved response.
+
