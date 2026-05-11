@@ -143,6 +143,31 @@ def extract_sources(search_results: List[Dict[str, Any]]) -> List[str]:
     return sources
 
 
+def split_answer_sources(answer: str) -> tuple[str, List[str]]:
+    """Split an answer into main text and a parsed Sources section."""
+    if "\nSources:\n" not in answer:
+        return answer, []
+
+    main_text, sources_block = answer.split("\nSources:\n", 1)
+    sources = [line.strip() for line in sources_block.splitlines() if line.strip()]
+    return main_text, sources
+
+
+def merge_sources(*source_groups: List[str]) -> List[str]:
+    """Merge source lists while preserving order and removing duplicates."""
+    merged = []
+    seen = set()
+
+    for group in source_groups:
+        for source in group:
+            if source in seen:
+                continue
+            seen.add(source)
+            merged.append(source)
+
+    return merged
+
+
 def validate_state(state: Dict[str, Any], required_keys: List[str]) -> bool:
     """
     Validate that the state contains required keys.
@@ -468,10 +493,12 @@ def refinement_fn(state: Dict[str, Any]) -> Dict[str, Any]:
             
             refined_answer = llm_advanced.invoke(enhancement_prompt).content
             
-            # Append sources from gap_results to the refined answer
+            # Preserve the original sources and add any new gap-filling sources
+            _, existing_sources = split_answer_sources(answer)
             gap_sources = extract_sources(gap_results)
-            if gap_sources:
-                refined_answer_with_sources = f"{refined_answer}\n\nSources:\n{chr(10).join(gap_sources)}"
+            all_sources = merge_sources(existing_sources, gap_sources)
+            if all_sources:
+                refined_answer_with_sources = f"{refined_answer}\n\nSources:\n{chr(10).join(all_sources)}"
             else:
                 refined_answer_with_sources = refined_answer
             
